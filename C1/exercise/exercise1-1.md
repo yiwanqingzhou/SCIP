@@ -85,3 +85,52 @@
 - 自定义都new-if是正则序  
 
 - **在new-if中重复调用方法会无限扩展导致死循环** 
+
+
+### 1.7
+> The good-enough? test used in computing square roots will not be very effective for finding the square roots of very small numbers. Also, in real computers, arithmetic operations are almost always performed with limited precision. This makes our test inadequate for very large numbers. Explain these statements, with examples showing how the test fails for small and large numbers.  
+> An alternative strategy for implementing good-enough? is to watch how guess changes from one iteration to the next and to stop when the change is a very small fraction of the guess. Design a square-root procedure that uses this kind of end test.   
+> Does this work better for small and large numbers?
+
+<br />
+
+```scheme
+(define (sqrt x) (sqrt-iter 0.5 1.0 x))
+
+(define (sqrt-iter lassguess guess x)
+  (if (good-enough? lassguess guess) guess
+      (sqrt-iter guess (improve guess x) x)))
+
+(define (good-enough? lassguess guess)
+  (< (abs (- lassguess guess) ) 0.01))
+
+```
+
+### 1.8
+
+> To implement a cube-root procedure analogous to the square-root procedure.
+
+```scheme
+(define (square x) (* x x))
+(define (cube x) (* x x x))
+
+(define (abs x)
+	(if (< x 0) (- x) x))
+
+(define (average x y z) 
+  (/ (+ x y z) 3))
+
+(define (improve guess x)
+  (average (/ x (square guess)) guess guess))
+
+(define (cube-root x) (cube-root-iter 1.0 x))
+
+(define (cube-root-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (cube-root-iter (improve guess x) x)))
+
+(define (good-enough? guess x)
+  (< (abs (- (cube guess) x) ) 0.01))
+
+```

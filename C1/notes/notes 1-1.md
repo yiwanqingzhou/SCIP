@@ -1,6 +1,6 @@
 # 1.1 The Elements of Programming
 
-### 1. 前缀运算
+## 1. 前缀运算
 ```scheme
 (+ 137 349)
 486
@@ -17,8 +17,8 @@
 ```
 
 
-### 2. define 定义
-#### 2.1 定义变量
+## 2. 命名 define 
+### 2.1 命名变量
 ```scheme
 (define size 2)
 
@@ -29,7 +29,7 @@ size
 10
 ```
 
-#### 2.2 定义方法
+### 2.2 命名过程
 ```scheme
 (define (square x) (* x x))
 ```
@@ -52,9 +52,14 @@ size
 136
 ```
 
-### 3. 正则序 & 应用序
+## 3. 正则序 & 应用序
 ##### 正则序：将式子完全展开后再计算  
 ##### 应用序：直到subexpression实际需要时才计算它的值
+
+> *normal-order evaluation*: fully expand and then reduce   
+> *applicative-order evaluation*: evaluate the arguments and then apply  
+> 
+> **Lisp uses applicative-order evaluation**
 
 ```scheme
 (define (square x) (* x x))
@@ -74,10 +79,10 @@ size
 ```
 再计算square
 
-##### Lips采用应用序求值  
 
+## 4. 条件判断
 
-### 4. cond条件
+### 4.1 cond
 ```scheme
     (cond (⟨p₁⟩ ⟨e₁⟩)
           (⟨p₂⟩ ⟨e₂⟩)
@@ -92,7 +97,7 @@ size
         ((< x 0) (-x))))
 ```
 
-### 5. else 否则
+### 4.2 else 
 
 ```scheme
 (define (abs x)
@@ -100,7 +105,7 @@ size
         (else x)))
 ```
 
-### 6. if
+### 4.3 if
 ```scheme
 	(if ⟨predicate⟩ ⟨consequent⟩ ⟨alternative⟩)
 ```
@@ -112,7 +117,7 @@ size
       x))
 ```
 
-### 7. and & or & not
+### 4.4 and & or & not
 
 ```scheme
 	(and ⟨e₁⟩ … ⟨eₙ⟩)
@@ -130,8 +135,7 @@ size
 
 ```
 
-### 8. 牛顿法求平方根
-##### 展示了如何不用任何都迭代结构（循环）来实现迭代
+## 5. 牛顿法求平方根 -- 递归
 
 ```scheme
 (define (sqrt-iter guess x)
@@ -156,4 +160,40 @@ size
   (sqrt-iter 1.0 x))
 
 ```
+
+##### 优化 good-enough? 方法
+> An alternative strategy for implementing good-enough? is to watch how guess changes from one iteration to the next and to stop when the change is a very small fraction of the guess. Design a square-root procedure that uses this kind of end test.
+
+```scheme
+
+(define (sqrt x) (sqrt-iter 0.5 1.0 x))
+
+(define (sqrt-iter lassguess guess x)
+  (if (good-enough? lassguess guess) guess
+      (sqrt-iter guess (improve guess x) x)))
+
+(define (good-enough? lassguess guess)
+  (< (abs (- lassguess guess) ) 0.01))
+
+```
+
+## 6. 抽象黑盒 Procedures as Black-Box Abstractions
+- 局部变量 Local names
+  
+- 内部定义和块结构 Internal definitions and block structure
+  - 可以将子过程局部化 
+  - 由于x在sqrt都定义中是受约束都，而子过程也都定义在sqrt中，也就是说都在x都定义域里。所以x不再需要作为形参在各过程中传递，可以直接作为内部参数直接调用
+
+  ```scheme
+  (define (sqrt x)
+    (define (good-enough? guess)
+      (< (abs (- (square guess) x)) 0.001))
+    (define (sqrt-iter guess)
+      (if (good-enough? guess)
+          guess
+          (sqrt-iter (improve guess))))        
+    (define (improve guess)
+      (average guess (/ x guess)))      
+    (sqrt-iter 1.0))
+  ```
 

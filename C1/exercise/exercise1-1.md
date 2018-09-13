@@ -1,7 +1,7 @@
 # Exercise 1-1
 
 
-### 1.1
+## 1.1
 
 ```scheme
 10
@@ -26,13 +26,15 @@
    (+ a 1))
 ```
 
-### 1.2
+
+## 1.2
 
 ```scheme
 (/ (+ 5 4 (- 2 (- 3 (+ 6 4/5))))(* 3 (- 6 2) (- 2 7)))
 ```
 
-### 1.3
+
+## 1.3
 > Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
 
 ```scheme
@@ -42,7 +44,8 @@
               (else (+ (max a b) (max b c)))))
 ```
 
-### 1.4
+
+## 1.4
 > Observe that our model of evaluation allows for combinations whose operators are compound expressions. Use this observation to describe the behavior of the following procedure:
 
 ```scheme
@@ -51,7 +54,7 @@
 ```
 <br />
 
-### 1.5
+## 1.5
 
 > Ben Bitdiddle has invented a test to determine whether the interpreter he is faced with is using applicative-order evaluation or normal-order evaluation. He defines the following two procedures:
 
@@ -72,8 +75,9 @@
 
 <br>
 在执行 (test 0 (p)) 时，采用正则序，p会无限扩展自己，导致死循环
+<br />
 
-### 1.6
+## 1.6
 ```scheme
 (define (new-if predicate then-clause else-clause)
    (cond (predicate then-clause))
@@ -87,7 +91,7 @@
 - **在new-if中重复调用方法会无限扩展导致死循环** 
 
 
-### 1.7
+## 1.7
 > The good-enough? test used in computing square roots will not be very effective for finding the square roots of very small numbers. Also, in real computers, arithmetic operations are almost always performed with limited precision. This makes our test inadequate for very large numbers. Explain these statements, with examples showing how the test fails for small and large numbers.  
 > An alternative strategy for implementing good-enough? is to watch how guess changes from one iteration to the next and to stop when the change is a very small fraction of the guess. Design a square-root procedure that uses this kind of end test.   
 > Does this work better for small and large numbers?
@@ -106,7 +110,8 @@
 
 ```
 
-### 1.8
+
+## 1.8
 
 > To implement a cube-root procedure analogous to the square-root procedure.
 
@@ -133,4 +138,35 @@
 (define (good-enough? guess x)
   (< (abs (- (cube guess) x) ) 0.01))
 
+```
+
+
+## 1.9
+
+> Each of the following two procedures defines a method for adding two positive integers in terms of the procedures inc, which increments its argument by 1, and dec, which decrements its argument by 1.
+
+```scheme
+(define (+ a b)
+  (if (= a 0) 
+      b 
+      (inc (+ (dec a) b))))
+```
+```scheme
+(define (+ a b)
+  (if (= a 0) 
+      b 
+      (+ (dec a) (inc b))))
+```
+
+## 1.10
+
+**Ackermann’s function**
+
+```scheme
+(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1)
+                 (A x (- y 1))))))
 ```

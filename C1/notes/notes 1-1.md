@@ -53,8 +53,8 @@ size
 ```
 
 ## 3. 正则序 & 应用序
-##### 正则序：将式子完全展开后再计算  
-##### 应用序：直到subexpression实际需要时才计算它的值
+#### 正则序：将式子完全展开后再计算  
+#### 应用序：直到subexpression实际需要时才计算它的值
 
 > *normal-order evaluation*: fully expand and then reduce   
 > *applicative-order evaluation*: evaluate the arguments and then apply  
@@ -161,7 +161,7 @@ size
 
 ```
 
-##### 优化 good-enough? 方法
+#### 优化 good-enough? 方法
 > An alternative strategy for implementing good-enough? is to watch how guess changes from one iteration to the next and to stop when the change is a very small fraction of the guess. Design a square-root procedure that uses this kind of end test.
 
 ```scheme
@@ -178,6 +178,7 @@ size
 ```
 
 ## 6. 抽象黑盒 Procedures as Black-Box Abstractions
+
 - 局部变量 Local names
   
 - 内部定义和块结构 Internal definitions and block structure

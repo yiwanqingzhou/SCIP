@@ -170,3 +170,39 @@
         (else (A (- x 1)
                  (A x (- y 1))))))
 ```
+
+## 1.11
+
+> A function f is defined by the rule that f(n)=n if n<3 and f(n)=f(n−1)+2f(n−2)+3f(n−3) if n≥3. Write a procedure that computes f by means of a recursive process. Write a procedure that computes f by means of an iterative process.
+
+```scheme
+(define (f-iter  a b c count)
+   (if (= count 0)
+       c
+       (f-iter (+ a (* 2 b) (* 3 c)) a b (- count 1))))
+
+(define (f n)
+   (f-iter 2 1 0 n))
+```
+
+
+## 1.12
+> The following pattern of numbers is called Pascal’s triangle.
+>
+>              1
+>            1   1
+>          1   2   1
+>        1   3   3   1
+>      1   4   6   4   1
+>            . . .
+> The numbers at the edge of the triangle are all 1, and each number inside the triangle is the sum of the two numbers above it.35 Write a procedure that computes elements of Pascal’s triangle by means of a recursive process.
+
+```scheme
+(define (Pascal row column)
+    (cond ((= column 1) 1)
+          ((= column row) 1)
+          ((or (= row 1) (= row 2)) 1)
+          (else (+ (Pascal (- row 1) column) 
+                   (Pascal (- row 1) (- column 1))))))
+```
+

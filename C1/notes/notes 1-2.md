@@ -144,4 +144,60 @@
 
 此程序与第一个fib过程的计算过程类似，都是产生出一个树形的递归计算过程。
 
+<br>
+
+### 1.2.3 增长的阶 Orders of Growth
+
+> The previous examples illustrate that processes can differ considerably in the rates at which they consume computational resources. One convenient way to describe this difference is to use the notion of order of growth to obtain a gross measure of the resources required by a process as the inputs become larger.
+
+<br />
+
+### 1.2.4 求幂 Exponentiation
+
+**计算b^n**
+
+- 直接翻译定义成递归过程：
+
+```scheme
+(define (expt b n)
+  (if (= n 0) 
+      1 
+      (* b (expt b (- n 1)))))
+```
+<br>
+
+- 线性迭代方式：
+```scheme
+(define (expt b n) 
+(expt-iter b n 1))
+
+(define (expt-iter b counter product)
+    (if (= counter 0)
+        product
+        (expt-iter b
+                    (- counter 1)
+                    (* b product))))
+```
+<br>
+
+- 对于指数为2都乘幂优化:
+  
+    b^n = (b^(n/2))^2  --- n is even  
+    b^n = b * b^(n-1)  --- n is odd
+
+```scheme
+(define (fast-expt b n)
+  (cond ((= n 0) 
+         1)
+        ((even? n) 
+         (square (fast-expt b (/ n 2))))
+        (else 
+         (* b (fast-expt b (- n 1))))))
+
+(define (even? n)
+  (= (remainder n 2) 0))
+```
+
+*remainder: 求余*
+
 

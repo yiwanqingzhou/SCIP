@@ -5,3 +5,9 @@
 - 增长的阶 theta
   
 - trace-entry 用法
+
+- 斐波那契数列logtime
+
+- runtime
+
+- exc1.28

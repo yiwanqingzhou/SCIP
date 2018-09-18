@@ -200,4 +200,101 @@
 
 *remainder: 求余*
 
+<br>
+
+### 1.2.5 最大公约数 Greatest Common Divisors
+
+**欧几里德算法：**
+>The idea of the algorithm is based on the observation that, if r is the remainder when a is divided by b, then the common divisors of a and b are precisely the same as the common divisors of b and r. Thus, we can use the equation  
+>```
+>GCD(a,b) = GCD(b,r)
+>```
+>to successively reduce the problem of computing a GCD to the problem of computing the GCD of smaller and smaller pairs of integers.
+
+```
+GCD(206,40) = GCD(40,6)
+            = GCD(6,4)
+            = GCD(4,2)
+            = GCD(2,0) = 2
+```
+
+```scheme
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+```
+
+**Lamé’s 定理：**
+>如果欧几里德算法需要k步计算出一对整数的GCD，那么这对数中较小的那个数必然大于或者等于第k个斐波那契数。
+
+<br>
+
+## 1.2.6 实例：素数检测 Testing for Primality
+
+- 寻找因子 Searching for divisors  
+
+  用从2开始的连续整数去检查它们能否整除n，
+  当且仅当n是自己都最小因子时，n为质数。  
+  此方法具有O(sqrt(n))的增长阶。
+
+    ```scheme
+    (define (smallest-divisor n)
+    (find-divisor n 2))
+
+    (define (find-divisor n test-divisor)
+    (cond ((> (square test-divisor) n) 
+            n)
+            ((divides? test-divisor n) 
+            test-divisor)
+            (else (find-divisor 
+                n 
+                (+ test-divisor 1)))))
+
+    (define (divides? a b)
+    (= (remainder b a) 0))
+
+    (define (prime? n)
+    (= n (smallest-divisor n)))
+    ```
+
+- 费马检查 The Fermat test
+  
+  > 费马小定理：如果n是一个素数，a是小于n的任意正整数，那么a都n次方与a模n同余。
+  >
+  > 如果n不是素数，那么，一般而言，大部分的 a < n 都满足上面关系。
+  >
+  > 这就引出了下面这个检查素数的算法：对于给定的整数n，随机任取一个 a < n 并计算出a^n取模n的余数。如果得到的结果不等于a，那么n就肯定不是素数。如果它就是a，那么n是素数都机会就很大。现在再取另一个随机的a并采用同样方式检查。如果它满足上述等式，那么我们就能对n是素数有更大都信心了。通过检查越来越多都a值，我们就可以不断增加对有关结果的信心。
+
+    <br>
+    为了实现费马检查，我们需要有一个过程来计算一个数的幂对另一个数取模的结果：
+
+    ```scheme
+    (define (expmod base exp m)
+        (cond ((= exp 0) 1)
+              ((even? exp)
+                (remainder 
+                    (square (expmod base (/ exp 2) m))
+                m))
+              (else 
+                (remainder 
+                    (* base (expmod base (- exp 1) m))
+                m))))
+    ```
+
+    <br>
+    执行费马检查需要选取1～n-1之间（包含这两者）的数a，而后检查a的n次幂取模n的余数是否等于a。随机数a都选取由random完成，我们假定它已经包含在scheme的基本过程中，它返回比其输入参数小的某个非负整数。这样，要得到1和n-1之间的随机数，只需要random(n-1)+1：
+
+    ```scheme
+    (define (fermat-test n)
+        (define (try-it a)
+            (= (expmod a n n) a))
+        (try-it (+ 1 (random (- n 1)))))
+
+    (define (fast-prime? n times)
+    (cond ((= times 0) true)
+            ((fermat-test n) 
+            (fast-prime? n (- times 1)))
+            (else false)))
+    ```
 

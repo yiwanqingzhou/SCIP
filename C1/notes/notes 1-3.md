@@ -229,3 +229,96 @@ $$f(x,y) = xa^2+yb+ab$$
 <br>
 
 ### 1.3.3 过程作为一般性的方法
+- 区间折半法寻找方程的根
+  
+
+- 函数不动点
+  
+> 满足方程 $f(x) = x$，那么称x为函数$f$的不动点。
+>
+> 对于某些函数，通过从某个猜测开始，反复地应用$f$
+> $$ f(x),\ f(f(x)),\ f(f(f(x)))，……$$ 
+> 直到值的变化不大时，就可以找到它的一个不动点。
+
+```scheme
+(define tolerance 0.0001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+```
+用这个方法求出方程 $y = sin y + cos y$ 的一个解：
+```scheme
+(fixed-point (lambda (y) (+ (sin y) (cos y)))
+             0.1)
+```
+
+<br>
+
+计算平方根：
+
+$$ y = \sqrt{x}$$
+$$ y^2 = x$$
+$$ y = \frac{x}{y}$$
+
+可以化为 $y = \frac{x}{y}$ 的不动点
+
+```scheme
+(define (sqrt x)
+  (fixed-point (lambda (y) (/ x y))
+                0.1))
+```
+但是这种方法搜寻不动点并不收敛，因为函数的特别，猜测的结果总是不断重复，在答案的两边震荡。
+我们可以将猜测的值改为 y 和 x/y 的平均值。
+
+```scheme
+(define (sqrt x)
+  (fixed-point (lambda (y) (average y (/ x y)))
+                0.1))
+```
+
+**查阅sqrt-contract.scm，对比1.1.7中的sqrt(x)与此版本的对比**
+
+<br>
+
+### 1.3.4 过程作为返回值
+
+- 平均阻尼
+
+求 $\sqrt{x}$ （$y\Rightarrow x/y$ 不动点）原程序（1.3.3）：
+```scheme
+(define (sqrt x)
+  (fixed-point (lambda (y) (average y (/ x y)))
+                1.0))
+
+```
+
+将平均阻尼的思维抽象成average-damp，程序改为：
+```scheme
+(define (average-damp f)
+    (lanbda(x) (average x (f x))))
+
+(define (sqrt x)
+  (fixed-point (average-damp (lambda (y) (/ x y)))
+                0.1))
+```
+
+推广为提取立方根的过程：
+```scheme
+(define (cube-root x)
+  (fixed-point 
+   (average-damp 
+    (lambda (y) 
+      (/ x (square y))))
+   1.0))
+```
+<br>
+
+- 牛顿法
+

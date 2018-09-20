@@ -722,3 +722,44 @@ $$ \frac{π}{4} = \frac{2⋅4⋅4⋅6⋅6⋅8⋅……}{3⋅3⋅5⋅5⋅7⋅7⋅
 
 (display (tan-cf 10 100))
 ```
+
+## 1.40
+
+```scheme
+(define (cubic a b c)
+  (lambda (x)
+    (+ (cube x)
+       (* a (square x))
+       (* b x)
+       c)))
+```
+
+
+## 1.41
+
+```scheme
+(display
+  (((double (double double)) inc) 0)
+)
+(newline)
+```
+
+
+## 1.42
+
+```scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (inc x)
+  (+ x 1))
+
+(define (square x)
+  (* x x))
+
+(display ((compose square inc) 6))
+```
+
+
+## 1.43
+

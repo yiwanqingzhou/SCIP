@@ -435,6 +435,7 @@ Alyssa 的 expmod 函数在理论上是没有错的，但是在实际中却运�
 
 
 ## 1.29
+
 >Simpson’s Rule is a more accurate method of numerical integration than the method illustrated above. Using Simpson’s Rule, the integral of a function f between a and b is approximated as
 >$$\frac{h}{3}\ (+4y_1+2y_2+4y_3+2y_4+⋯+2y_{n−2}+4y_{n−1}+y_n)$$
 >where $h=(b−a)/n$, for some even integer $n$, and $y_k=f(a+kh)$. (Increasing $n$ increases the accuracy of the approximation.) Define a procedure that takes as arguments $f,\ a,\ b,$ and $n$ and returns the value of the integral, computed using Simpson’s Rule. Use your procedure to integrate cube between 0 and 1 (with $n$=100 and $n$=1000), and compare the results to those of the integral procedure shown above.
@@ -461,6 +462,7 @@ Alyssa 的 expmod 函数在理论上是没有错的，但是在实际中却运�
 ```
 
 ## 1.30
+
 >The sum procedure above generates a linear recursion. The procedure can be rewritten so that the sum is performed iteratively. Show how to do this by filling in the missing expressions in the following definition:
 >```scheme
 >(define (sum term a next b)
@@ -584,4 +586,139 @@ $$ \frac{π}{4} = \frac{2⋅4⋅4⋅6⋅6⋅8⋅……}{3⋅3⋅5⋅5⋅7⋅7⋅
 
 (define (sum-even a b)
   (filtered-accmulate plus 0 prime? identity a inc b))
+```
+
+
+## 1.34
+
+
+## 1.35
+```scheme
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) 
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(display
+(fixed-point (lambda (x) (+ 1 (/ 1 x)))
+              1.0)
+)
+(newline)
+```
+
+## 1.36
+```scheme
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) 
+       tolerance))
+  (define (try guess step)
+    (display-step step guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next (+ step 1)))))
+  (try first-guess 1))
+
+(define (display-step step guess)
+      (display "step ")
+      (display step)
+      (display ":  ")
+      (display guess)
+      (newline))
+
+(define (average x y)
+(/ (+ x y) 2))
+
+(display "non-average")
+(newline) 
+(fixed-point (lambda (x)
+                  (/ (log 1000) (log x)))
+             2.0)  
+
+(newline)
+(display "average")
+(newline)     
+(fixed-point (lambda (x)
+                  (average x (/ (log 1000) (log x))))
+             2.0)        
+```
+
+## 1.37
+```scheme
+(define (cont-frac n d k)
+  (define (con-iter i result)
+    (if (= i 0)
+        result
+        (con-iter (- i 1) (/ (n i) (+ (d i) result)))))
+  (con-iter k 0))
+
+(define (cont-frac-recursion n d k)
+  (define (con-recursion i)
+    (if (= i k)
+          (/ (n i) (d i))
+          (/ (n i) (+ (d i) (con-recursion (+ i 1))))))
+  (con-recursion 1))
+
+(define (try k)
+  (cont-frac (lambda (i) 1.0)
+             (lambda (i) 1.0)
+             k))
+
+(define (try-r k)
+  (cont-frac-recursion (lambda (i) 1.0)
+                       (lambda (i) 1.0)
+                       k))
+```
+
+
+## 1.38
+```scheme
+(define (cont-frac n d k)
+  (define (con-iter i result)
+    (if (= i 0)
+        result
+        (con-iter (- i 1) (/ (n i) (+ (d i) result)))))
+  (con-iter k 0))
+
+(define (try k)
+  (cont-frac (lambda (i) 1.0)
+             d
+             k))
+
+(define (d i)
+  (if (= (remainder i 3) 2)
+      (* 2 (/ (+ i 1) 3) )
+      1))
+      
+(display (+ 2(try 10)))
+```
+
+## 1.39
+```scheme
+(define (cont-frac n d k)
+  (define (con-iter i result)
+    (if (= i 0)
+        result
+        (con-iter (- i 1) (/ (n i) (+ (d i) result)))))
+  (con-iter k 0.0))
+
+(define (tan-cf x k)
+  (define (n i)
+    (if (= i 1) x (- (* x x))))
+  (define (d i)
+    (- (* i 2) 1))
+  (cont-frac n d k))
+
+(display (tan-cf 10 100))
 ```

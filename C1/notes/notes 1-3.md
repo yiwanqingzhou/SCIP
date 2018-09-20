@@ -108,3 +108,124 @@ $$ \int_{a}^{b}f=[\ f(a+\frac{dx}{2})+f(a+dx+\frac{dx}{2})+f(a+2dx+\frac{dx}{2})
   (* (sum f (+ a (/ dx 2.0)) add-dx b) 
      dx))
 ```
+<br>
+
+### 1.3.2 用lambda构造过程
+
+一般而言，lambda创建过程都方式与define相同，但不需要提供过程名字
+```scheme
+(lambda (⟨formal-parameters⟩) ⟨body⟩)
+
+(lambda (x) (+ x 4))
+
+(lambda                     (x)     (+   x     4))
+    |                        |       |   |     |
+the procedure of an argument x that adds x and 4
+
+
+((lambda (x) (+ x 4)) 1)
+> 5
+
+```
+
+<br>
+<br>
+
+ 事实上
+ ```scheme
+ (define (plus4 x) (+ x 4))
+```
+等价于
+```scheme
+ (define plus4 (lambda (x) (+ x 4)))
+```
+
+<br>
+
+**用let创建局部变量**
+
+lambda的另一个应用是创建局部变量。
+
+在一个过程里，除了使用那些已经约束为过程参数的变量外，我们常常还需要另外一些局部变量。
+
+例如，
+
+$$f(x,y) = x(1+xy)^2 + y(1-y) +(1+xy)(1-y)$$
+
+可能就希望表述成
+$$a = 1 + xy$$
+$$b = 1 - y$$
+$$f(x,y) = xa^2+yb+ab$$
+
+程序：
+
+```scheme
+(define (f x y)
+  (define (f-helper a b)
+    (+ (* x (square a))
+       (* y b)
+       (* a b)))
+  (f-helper (+ 1 (* x y)) 
+            (- 1 y)))
+```
+
+用lambda：
+
+```scheme
+(define (f x y)
+  ((lambda (a b)
+     (+ (* x (square a)) 
+        (* y b) 
+        (* a b)))
+   (+ 1 (* x y))
+   (- 1 y)))
+```
+
+用let：
+
+```scheme
+(define (f x y)
+  (let ((a (+ 1 (* x y)))
+        (b (- 1 y)))
+    (+ (* x (square a))
+       (* y b)
+       (* a b))))
+```
+
+<br>
+
+**let的定义：**
+
+```scheme
+(let ((⟨var₁⟩ ⟨exp₁⟩)
+      (⟨var₂⟩ ⟨exp₂⟩)
+      …
+      (⟨varₙ⟩ ⟨expₙ⟩))
+  ⟨body⟩)
+
+
+((lambda (⟨var₁⟩ … ⟨varₙ⟩)
+   ⟨body⟩)
+ ⟨exp₁⟩
+ …
+ ⟨expₙ⟩)
+```
+
+<br>
+
+**let定义的变量的值是在let之外计算的**
+
+假如x的值为2，那么在以下let中，x = 3，y = 4：
+
+```scheme
+(let ((x 3)
+      (y (+ x 2)))
+  (* x y))
+
+> 12
+```
+
+
+<br>
+
+### 1.3.3 过程作为一般性的方法

@@ -84,3 +84,57 @@ $$\frac{n_1}{d_1} = \frac{n_2}{d_2} \quad 当且仅当 \quad n_1d_2 = n_2d_1$$
 (car (cdr z))
 > 3
 ```
+
+<br>
+
+那么，有理数的表示也很容易了：
+```scheme
+(define (make-rat n d)
+  (cons n d))
+
+(define (numer x)
+  (car x))
+
+(define (denom x)
+  (cdr x))
+```
+
+**考虑约分和正负有理数**
+```scheme
+(define (gcd a b)
+(if (= (remainder a b) 0)
+    b
+    (gcd b (remainder a b))))
+
+(define (fix-abs x)
+  (if (or (and (< (car x) 0) (< (cdr x) 0)) 
+          (and (> (car x) 0) (< (cdr x) 0)))
+      (cons (- (car x)) (- (cdr x)))
+      x))
+
+(define (make-rat n d)
+  (let ((g (gcd n d)))
+    (fix-abs (cons (/ n g) (/ d g)))))
+
+
+(define (numer x)
+  (car x))
+  
+(define (denom x)
+  (cdr x))
+```
+
+<br>
+
+### 2.1.2 抽象屏蔽
+
+
+
+
+
+
+
+
+
+
+

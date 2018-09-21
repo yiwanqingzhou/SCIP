@@ -763,3 +763,89 @@ $$ \frac{π}{4} = \frac{2⋅4⋅4⋅6⋅6⋅8⋅……}{3⋅3⋅5⋅5⋅7⋅7⋅
 
 ## 1.43
 
+```scheme
+(define (repeat f n)
+  (if (= n 1)
+      f
+      (lambda (x)
+          (f ((repeat f (- n 1)) x)))))
+
+
+(define (repeat f n)
+  (define (repeat-iter k result)
+    (if (= k 1)
+        result
+        (repeat-iter (- k 1)
+                      (lambda (x)
+                              (f (result x))))))
+  (repeat-iter n f))   
+```
+
+```scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (repeat f n)
+  (if (= n 1)
+      f
+      (compose f (repeat f (- n 1)))))
+
+
+(define (repeat f n)
+  (define (repeat-iter k result)
+    (if (= k 1)
+        result
+        (repeat-iter (- k 1)
+                     (compose f result))))
+  (repeat-iter n f))
+```  
+
+
+## 1.44
+```scheme
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+(define (repeat f n)
+  (define (repeat-iter k result)
+    (if (= k 1)
+        result
+        (repeat-iter (- k 1)
+                     (compose f result))))
+  (repeat-iter n f))
+
+(define dx 0.00001)
+
+(define (smooth f)
+  (lambda (x)
+    (/ (+ (f (- x dx))
+          (f x)
+          (f (+ x dx)))
+        3)))
+
+(define (square x)
+  (* x x))
+
+(define (repeat-smooth f n)
+  ((repeat smooth n) f))
+```
+
+
+## 1.45
+
+## 1.46
+```scheme
+(define (iterative-improve good-enough? improve)
+  (lambda (guess)
+      (let ((next (improve guess)))
+        (if (good-enough? guess next)
+            guess
+            ((iterative-improve good-enough? improve) next)))))
+
+
+(define (fixed-point f first-guess)
+  (define tolerance 0.0001)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  ((iterative-improve close-enough? f) first-guess))
+```  

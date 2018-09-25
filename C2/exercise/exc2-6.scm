@@ -5,3 +5,7 @@
 
 (define (add-1 n)
   (lambda (f) (lambda (x) (f ((n f) x)))))
+
+(display 
+((zero 2) 1))
+(newline)

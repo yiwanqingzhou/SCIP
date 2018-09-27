@@ -196,7 +196,7 @@ Now we can give a new definition of scale-list in terms of map:
       (begin
         (proc (car items))
         (for-each proc (cdr items)))))
-        
+
 
 (for-each 
  (lambda (x) (newline) (display x))
@@ -206,5 +206,15 @@ Now we can give a new definition of scale-list in terms of map:
 > 321
 > 88
 ```
+<br>
 
 
+### 2.2.2 层次性结构 **难**
+
+```scheme
+(define (count-leaves x)
+  (cond ((null? x) 0)
+        ((not (pair? x) 1))
+        (else (+ (count-leave (car x))
+                 (count-leave (cdr x))))))
+```                 

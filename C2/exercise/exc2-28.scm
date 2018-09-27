@@ -1,0 +1,50 @@
+
+(define (fringe items)
+    ; (display "items: ")
+    ; (display items)
+    ; (newline)
+  (cond ((null? items) 
+            ; (display "  nil")
+            ; (newline)
+            '())
+        ((not (pair? items))  
+            ; (display "  not pair")
+            ; (newline)
+            (list items))
+        (else
+            ; (display "   car: ")
+            ; (display (car items))
+            ; (display "   cdr: ")
+            ; (display (cdr items))
+            ; (newline)
+            (append (fringe (car items))
+                    (fringe (cdr items))))))
+
+
+(define y (list (list 1 2 5) (list 3 4)))
+(display y)
+(newline)
+(display (fringe y))
+(newline)
+
+
+(define (tree-reverse lst)
+  (define (iter remained-items result)
+      ; (display "remained-items:  ")
+      ; (display remained-items)
+      ; (newline)
+      ; (display "result:  ")
+      ; (display result)
+      ; (newline)
+      (if (null? remained-items)
+          result
+          (iter (cdr remained-items)
+                (append
+                        (if (pair? (car remained-items))
+                            (tree-reverse (car remained-items))
+                            (list (car remained-items)))
+                        result))))
+  (iter lst '()))
+
+(display (tree-reverse y))
+(newline)

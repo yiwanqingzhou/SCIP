@@ -51,3 +51,11 @@
       (cons (car list1) 
             (append (cdr list1) 
                     list2))))
+
+
+(define (count-leave x)
+  (cond ((null? x) 0)
+        ((not (pair? x) 1))
+        (else (+ count-leave (car x)
+                 count-leave (cdr x)))))                
+                                     

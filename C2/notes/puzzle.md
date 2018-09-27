@@ -15,10 +15,6 @@
 (define d (cons 1 (cons 2 (list 3 4))))
 ```
 
-- exc 2.27
-- exc 2.28
-
-
 
 ```scheme
 (define nil '())
@@ -39,3 +35,8 @@
 (append x nil)
 (append nil x)
 ```
+
+
+- exc 2.27
+- exc 2.28
+- exc 2.32

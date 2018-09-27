@@ -218,3 +218,43 @@ Now we can give a new definition of scale-list in terms of map:
         (else (+ (count-leave (car x))
                  (count-leave (cdr x))))))
 ```                 
+
+<br>
+
+#### 对树的映射
+
+map是处理序列的一种强有力的抽象，于此类似，map与递归的结合也是处理树的一种强有力抽象。
+
+例如，可以有与2.2.1节的scale-list类似的scale-tree过程，以一个数值因子和一颗树作为参数，返回一颗具有同样形状的树，树中的每个数值都做了一次缩放。
+
+对于scale-tree的递归方案也与count-leaves类似：
+
+```scheme
+(define (scale-tree tree factor)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) 
+            (* tree factor))
+        (else
+         (cons (scale-tree (car tree) 
+                           factor)
+               (scale-tree (cdr tree) 
+                           factor)))))
+```
+<br>
+
+另一种方法是将树看成子树的序列，并对它使用map。我们在这种序列上做映射，依次对各颗子树做缩放，并返回结果的表。对于基础情况，也就是当被处理的树是树叶时，就直接用因子去乘它。
+```scheme
+(define (map proc items)
+  (if (null? items)
+      nil
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+            
+
+(define (scale-tree tree factor)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (scale-tree sub-tree factor)
+             (* sub-tree factor)))
+       tree))
+```

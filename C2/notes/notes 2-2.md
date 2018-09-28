@@ -249,7 +249,7 @@ map是处理序列的一种强有力的抽象，于此类似，map与递归的�
       nil
       (cons (proc (car items))
             (map proc (cdr items)))))
-            
+
 
 (define (scale-tree tree factor)
   (map (lambda (sub-tree)
@@ -257,4 +257,115 @@ map是处理序列的一种强有力的抽象，于此类似，map与递归的�
              (scale-tree sub-tree factor)
              (* sub-tree factor)))
        tree))
+```
+<br>
+
+
+### 2.2.3 序列作为一种约定的界面
+
+**sum-odd-squares** 以一棵树为参数,计算出值为奇数的叶子的平方和:
+```scheme
+(define (sum-odd-squares tree)
+  (cond ((null? tree) 0)
+        ((not (pair? tree))
+         (if (odd? tree) (square tree) 0))
+        (else (+ (sum-odd-squares 
+                  (car tree))
+                 (sum-odd-squares 
+                  (cdr tree))))))
+```
+<br>
+
+> 这个过程可以用一些级联的处理步骤的信号来描述:
+> 
+> - 从一个**枚举器**开始，它产生出由给定的树的所有树叶组成“信号”。   
+> - 这一信号流过一个**过滤器**，所有不是奇数的树都被删除了。   
+> - 这样得到的信号又通过一个**映射**，这是一个“转换装置”，它将square过程应用于每个元素。   
+> - 这一输出被馈入一个**累积器**，该装置用 + 将所有的元素组合起来，以初始的0开始。
+
+<br>
+
+- **映射**  
+  可以用map过程来完成:
+
+  ```scheme
+  (map square (list 1 2 3 4 5))
+  > (1 4 9 16 25)
+  ```
+
+- **过滤器**  
+  过滤一个序列，也就是选出满足某个给定谓词的元素。
+
+  ```scheme
+  (define (filter predicate sequence)
+    (cond ((null? sequence) nil)
+          ((predicate (car sequence))
+          (cons (car sequence)
+                (filter predicate 
+                        (cdr sequence))))
+          (else  (filter predicate 
+                        (cdr sequence)))))
+
+
+  (filter odd? (list 1 2 3 4 5))
+  > (1 3 5)
+  ```
+
+- **累积器**：
+
+  ```scheme
+  (define (accumulate op initial sequence)
+    (if (null? sequence)
+        initial
+        (op (car sequence)
+            (accumulate op 
+                        initial 
+                        (cdr sequence)))))
+
+
+  (accumulate + 0 (list 1 2 3 4 5))
+  > 15
+  (accumulate * 1 (list 1 2 3 4 5))
+  > 120
+  (accumulate cons nil (list 1 2 3 4 5))
+  > (1 2 3 4 5)
+  ```
+
+- **枚举器**  
+  剩下的就是实现有关的信号流图，枚举出需要处理的数据序列。  
+  枚举出一棵树的所有树叶，可以用：
+
+  ```scheme
+  (define (enumerate-tree tree)
+    (cond ((null? tree) nil)
+          ((not (pair? tree)) (list tree))
+          (else (append 
+                (enumerate-tree (car tree))
+                (enumerate-tree (cdr tree))))))
+
+  (enumerate-tree (list 1 (list 2 (list 3 4)) 5))
+  (1 2 3 4 5)
+  ```
+
+现在可以像信号流图那样重新构造**sum-odd-squares**了。
+```scheme
+(define (sum-odd-squares tree)
+  (accumulate 
+   +
+   0
+   (map square
+        (filter odd?
+                (enumerate-tree tree)))))
+```
+<br>
+
+我们还可以按照顺序操作的方式来制定传统的数据处理应用程序。假设我们有一系列的人事记录，我们想要找到薪水最高的程序员的薪水。假设我们有一个返回记录薪水的选择器salary，还有一个谓词programmer?检查记录是否为程序员。那么我们可以写成：
+
+```scheme
+(define (salary-of-highest-paid-programmer records)
+  (accumulate 
+   max
+   0
+   (map salary
+        (filter programmer? records))))
 ```

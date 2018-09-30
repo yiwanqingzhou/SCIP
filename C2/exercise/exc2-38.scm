@@ -1,3 +1,5 @@
+
+
 (define (fold-left op initial sequence)
   (define (iter result rest)
     (if (null? rest)
@@ -6,7 +8,8 @@
               (cdr rest))))
   (iter initial sequence))
 
-
+  
+;;;accumulate
 (define (fold-right op initial sequence)
   (if (null? sequence)
       initial

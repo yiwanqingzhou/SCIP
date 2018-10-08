@@ -377,4 +377,46 @@ map是处理序列的一种强有力的抽象，于此类似，map与递归的�
 
 > 这个过程用信号来描述:
 >
-> 对于每个整数 $i<=n$，
+> 1. 对序列```(enumerate-interval 1 n)```做一次映射，得到 $i$。
+> 
+> 2. 对于每个i，对序列```(enumerate-interval 1 （- i 1))```做一次映射，得到 $j$。
+>
+> 3. 对于每个j，用map生成序对```(list i j)```
+> 
+> 4. 将所有序对组合起来（用append累积起来）
+>
+> 5. 过滤和不为素数的序对
+>
+> 6. 用map对每个序对生成序对```(list i j (+ i j))```
+
+
+```scheme
+
+;;;The combination of mapping and accumulating with append
+
+(define (flatmap proc seq)
+  (accumulate append nil (map proc seq)))
+
+;;;
+(define (prime-sum? pair)
+  (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+  (list (car pair) 
+        (cadr pair) 
+        (+ (car pair) (cadr pair))))
+
+;;;
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter 
+        prime-sum?
+        (flatmap
+         (lambda (i)
+           (map (lambda (j) 
+                  (list i j))
+                (enumerate-interval 
+                 1 
+                 (- i 1))))
+         (enumerate-interval 1 n)))))       
+```

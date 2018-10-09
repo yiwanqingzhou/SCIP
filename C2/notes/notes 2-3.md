@@ -40,3 +40,6 @@ a
         (else (memq item (cdr x)))))
 ```
 
+<br>
+
+### 2.3.2 Example: Symbolic Differentiation 符号求导

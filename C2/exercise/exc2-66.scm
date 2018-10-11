@@ -1,14 +1,3 @@
-
-;;; 未排序
-(define (lookup given-key set-of-records)
-  (cond ((null? set-of-records) #f)
-        ((equal? given-key (key (car set-of-records)))
-            (car set-of-records))
-        (else (lookup given-key (cdr set-of-records)))))
-
-
-
-;;; 二叉树
 (define (lookup given-key set-of-records)
   (if (null? set-of-records)
       #f

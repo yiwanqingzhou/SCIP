@@ -280,3 +280,118 @@ a
                        ((> x1 x2)
                          (cons x2 (union-set set1 s2))))))))
 ```
+<br>
+
+
+#### 集合作为二叉树 Sets as binary trees
+
+- 树中每个结点保存集合中的一个元素，称为该结点的“数据项”，它还链接到另外的两个结点（可能为空）。  
+  其中“左边”的链接所指向的所有元素均小于本结点的元素，而“右边”链接到的元素都大于本结点里的元素。
+
+- 同一个集合表示为树可能有多种不同的方式。  
+  我们对一个合法表示的要求就是，位于左子树里的所有元素都小于本结点里的数据项，而位于右子树里的所有元素都大于它。
+
+- 我们可以用表来表示树，将结点表示为三个元素的表：本结点中的数据项，其左子树和右子树。  
+  以空表作为左子树或者右子树，就表示没有子树连接在哪里。
+
+```scheme
+(define (entry tree) (car tree))
+
+(define (left-branch tree) (cadr tree))
+
+(define (right-branch tree) (caddr tree))
+
+(define (make entry left right)
+    (list entry left right))
+```
+<br>
+
+
+- **element-of-set?**
+```scheme
+(define (element-of-set? x set)
+    (cond ((null? set) #f)
+          ((= x (entry set)) #t)
+          ((< x (entry set))
+            (element-of-set? x (left-branch set))
+          ((> x (entry set))
+            (element-of-set? x (right-branch set))))))
+```
+
+- **adjoin-set**
+```scheme
+(define (adjoin-set x set)
+    (cond ((null? set) (make-tree x '() '()))
+          ((= x (entry set)) set)
+          ((< x (entry set))
+            (make-tree (entry set)
+                       (adjoin-set x (left-branch set))
+                       (right-branch set)))
+          ((> x (entry set))
+            (make-tree (entry set)
+                       (left-branch set)
+                       (adjoin-set x (right-branch))))))   
+```
+<br>
+
+**但是adjoin-set并不能保证树的平衡性**  
+
+只有平衡二叉树，才能实现对数复杂度的搜索。
+
+解决这个问题的一种方式是定义一个操作，它可以将任意的树变换为一棵具有同样元素的平衡树。
+在每执行过几次adjoin-set操作之后，我们就可以通过执行它来保持树的平衡。
+
+当然，解决这个通体的方法还有很多，大部分这类方法都涉及到设计一种新的数据结构（比如B树和红黑树），设法使这种数据结构上的搜索和插入操作都能够在 $O(log n)$ 步数内完成。
+
+```scheme
+(define (tree->list tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+        result-list
+        (copy-to-list (left-branch tree)
+                      (cons (entry tree)
+                            (copy-to-list (right-branch tree)
+                                          result-list)))))
+  (copy-to-list tree '()))
+
+```
+
+<br>
+
+#### 集合与信息检索 information retrieval
+
+集合所讨论的技术在涉及信息检索的各种应用中将会一次又一次地出现。
+
+典型的数据管理系统都需将大量时间用在访问和修改所存的数据上，因此就需要访问记录的高效方法。  
+完成此事的一种方式是将每个记录中的一部分当作标识key（键值）。
+所用键值可以是任何能唯一标识记录的东西。  
+在确定了采用什么键值之后，就可以将记录定义为一种数据结构，并包含key选择过程，它可以从给定记录中提取出有关的键值。
+
+现在就可以将这个数据库表示为一个记录的集合。为了根据给定键值确定相关记录的位置，我们用一个过程 ```lookup```，它以一个键值和一个数据库为参数，返回具有这个键值的记录，或者在找不到相应记录时报告失败。  
+
+<br>
+
+```lookup``` 的实现方式几乎与 ```element-of-set?``` 一模一样，如果记录的集合被表示为未排序的表，我们就可以用：
+
+
+```scheme
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) #f)
+        ((equal? given-key (key (car set-of-records)))
+            (car set-of-records))
+        (else (lookup given-key (cdr set-of-records)))))
+```
+<br>
+
+如果记录的集合被表示为二叉树的表，我们就可以用：
+```scheme
+(define (lookup given-key set-of-records)
+  (if (null? set-of-records)
+      #f
+      (let ((cur-key (key (entry set-of-records))))
+        (cond ((= given-key cur-key) (entry set-of-records))
+              ((< given-key cur-key)
+                  (lookup given-key (left-branch set-of-records)))
+              ((> given-key cur-key)
+                  (lookup given-key (right-branch set-of-records)))))))
+```

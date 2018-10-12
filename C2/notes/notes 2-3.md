@@ -399,6 +399,8 @@ a
 <br>
 
 ### 2.3.4 实例：Huffman编码树
+    
+    "huffman.scm"
 
 - 定长编码 fixed-length codes  
     Representing each symbol in the message with the same number of bits.

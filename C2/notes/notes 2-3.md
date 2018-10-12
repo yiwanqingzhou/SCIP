@@ -395,3 +395,171 @@ a
               ((> given-key cur-key)
                   (lookup given-key (right-branch set-of-records)))))))
 ```
+
+<br>
+
+### 2.3.4 实例：Huffman编码树
+
+- 定长编码 fixed-length codes  
+    Representing each symbol in the message with the same number of bits.
+
+    <br>
+
+- 变长编码 variable-length codes  
+  
+  Different symbols may be represented by different numbers of bits.
+
+  One of the difficulties of using a variable-length code is knowing when you have reached the end of a symbol in reading a sequence of zeros and ones. 
+
+    - 分隔符 separator code 
+
+
+    - 前缀码 prefix code
+  
+        To design the code in such a way that no complete code for any symbol is the beginning (or prefix) of the code for another symbol.
+
+<br>
+
+如果能够通过变长前缀码去利用被编码消息中符号出现的相对频度，那么就能明显地节约空间。
+完成这件事情的一种特定方式成为Huffman编码。
+
+一个Huffman编码可以表示为一棵二叉树，其中的树叶都是被编码的符号。  
+树中每个非叶结点代表一个集合，其中包含了这一结点之下的所有树叶上的符号。
+除此之外，位于树叶的每个符号还被赋予一个权重（也就是它的相对频度），非叶结点所包含的权重是位于它之下的所有叶结点的权重之和。这种权重在编码和解码中并不使用。
+
+<br>
+
+**Huffman解码**
+P111
+
+<br>
+
+**生成Huffman树**
+
+生成Huffman树的算法实际上十分简单，其想法就是设法安排这棵树，使得那些带有最低频度的符号出现在离树根最远的地方。  
+
+这一构造过程从叶结点的集合开始，这种结点中包含各个符号和它们的频度，这就是开始构造编码的初始数据。  
+现在要找出两个具有最低权重的叶，归并它们，产生出一个以这两个结点为左右分支的结点。新结点的权重就是那两个结点的权重之和。然后我们从原来的集合里删除前面的两个叶结点，并用这个新的结点代替它们。  
+随后继续这一过程，在其中的每一步都归并两个具有最小权重的结点，将它们从集合中删除并用一个以这两个结点作为左右分钟的新结点取而代之。
+当集合中只剩下一个结点时，过程终止，而这个结点就是树根。
+
+    Initial {(A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)}
+
+    Merge   {(A 8) (B 3) ({C D} 2) (E 1) (F 1) (G 1) (H 1)}
+
+    Merge   {(A 8) (B 3) ({C D} 2) ({E F} 2) (G 1) (H 1)}
+
+    Merge   {(A 8) (B 3) ({C D} 2) ({E F} 2) ({G H} 2)}
+
+    Merge   {(A 8) (B 3) ({C D} 2) ({E F G H} 4)}
+
+    Merge   {(A 8) ({B C D} 5) ({E F G H} 4)}
+
+    Merge   {(A 8) ({B C D E F G H} 9)}
+
+    Final   {({A B C D E F G H} 17)}
+
+<br>
+
+**Huffman树的表示**
+
+将一棵树的树叶表示为包含符号leaf、叶中符号和权重的表：
+
+```scheme
+(define (make-leaf symbol weight)
+    (list 'leaf symbol weight))
+
+(define (leaf? object)
+    (eq? (car object) 'leaf ))
+    
+(define (symbol-leaf x) (cadr x)) 
+(define (weight-leaf x) (caddr x))
+```
+
+<br>
+
+一棵一般的树也是一个表，其中包含一个左分支、一个右分支、一个符号集合和一个权重。
+
+在归并两个结点做出一棵树时，树的权重也就是这两个结点的权重之和，其符号集就是两个结点的符号集的并集。因为这里的符号集用表来表示，通过 ```append``` 过程就可以得到它们的并集。
+
+但在对树叶或者一般树调用过程 ```symbols``` 和 ```wight``` 时，它们需要做的事情有一点不同。
+
+```scheme
+(define (make-code-tree left right)
+    (list left
+          right
+          (append (symbols left) (symbols right))
+          (+ (weight left) (weight right))))
+
+(define (left-branch tree)
+    (car tree))
+
+(define (right-branch tree)
+    (cadr tree))
+
+(define (symbols tree)
+    (if (leaf? tree)
+        (list (symbol-leaf tree))
+        (caddr tree)))
+
+(define (weight tree)
+    (if (leaf? tree)
+        (weight-leaf tree)
+        (cadddr tree)))      
+```
+
+<br>
+
+**解码过程**
+The decoding procedure
+
+解码的过程以一个0／1表和一棵Huffman树为参数：
+```scheme
+(define (decode bits tree)
+    (define decode-1 bits current-branch)
+        (if (null? bits)
+            '()
+            (let ((next-branch 
+                    (choose-branch (car bits) current-branch)))
+                (if (leaf? next-branch)
+                    (cons (symbols current-branch)
+                          (decode-1 (cdr bits) tree))
+                    (decode-1 (cdr bits) next-branch))))
+    (decode-1 bits tree))
+    
+(define (choose-branch bit branch)
+    (cond ((= bit 0) (left-branch branch))
+          ((= bit 1) (right-branch branch))
+          (else (error "bad bit -- CHOOSE-BRANCH" bit))))
+```
+
+<br>
+
+**带权重元素的集合**
+Sets of weighted elements
+
+在树的表示中，每个非叶节点都包含一组符号，我们将其表示为一个简单的列表。但是，上面讨论的树生成算法还要求我们处理树叶和树的集合，依次合并两个最小的项。因为我们需要重复地找到集合中最小的项，所以对这种集合使用有序表示是很方便的。
+
+我们准备将树叶和树的集合表示为一批元素的表，按照权重的上升顺序排列表中的元素。
+
+```scheme
+(define (adjoin-set x set)
+    (cond ((null? set) (list x))
+          ((< (weight x) (weight (car set)))
+                (cons x set))
+          (else
+            (cons (car set)
+                  (adjoin-set x (cdr set))))))
+```
+
+下面过程构造出树叶的初始排序集合（以一个符号-权重对偶的表为参数，如 ```((A 4) (B 2) (C 1) (D 1))```）：
+```scheme
+(define (make-leaf-set pairs)
+    (if (null? pairs)
+        '()
+        (let ((pair (car pairs)))
+            (adjoin-set (make-leaf (car pair)
+                                   (cadr pair))
+                        (make-leaf-set (cdr pairs))))))
+```
+

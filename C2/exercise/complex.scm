@@ -1,3 +1,6 @@
+
+
+
 ;;; 添加标志 / 选取内容
 (define (attach-tag type-tag contents)
   (cons type-tag contents))
@@ -17,10 +20,10 @@
 
 ;;; 直角坐标 / 极坐标
 (define (rectangular? z)
-  (eq? (type-tag z) 'rectangular))
+  (eq? (type-tag z) 'rectangular ))
 
 (define (polar? z)
-  (eq? (type-tag z) 'polar))
+  (eq? (type-tag z) 'polar ))
 
 
 (define (real-part z)
@@ -51,6 +54,7 @@
   (cond ((rectangular? z)
          (angle-rectangular (contents z)))
         ((polar? z)
+          ())))
 
 
 ;;; 构造

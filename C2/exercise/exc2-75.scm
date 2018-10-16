@@ -6,12 +6,14 @@
     (cond ((eq? op 'magnitude ) r)
           ((eq? op 'angle ) a)
           ((eq? op 'real-part ) 
-           (* r (cons a)))
+           (* r (cos a)))
           ((eq? op 'imag-part ) 
             (* r (sin a)))
           (else
-           (error "Unknown op: 
-            MAKE-FROM-MAG-ANG" op))))
+           (error "Unknown op: MAKE-FROM-MAG-ANG" op))))
   dispatch)
 
 
+(define (apply-generic op arg) (arg op))
+
+(apply-generic 'angle (make-from-mag-ang 1 20))

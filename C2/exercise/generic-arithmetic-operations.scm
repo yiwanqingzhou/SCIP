@@ -1,7 +1,3 @@
-(load "put-and-get.scm")
-(load "tagged-data.scm")
-(load "data-directed-programming.scm")
-
 
 (define (add x y) (apply-generic 'add x y))
 (define (sub x y) (apply-generic 'sub x y))
@@ -63,12 +59,38 @@
         (lambda (x y) (tag (div-rat x y))))
     (put 'make 'rational
         (lambda (n d) (tag (make-rat n d))))
+        
+    (put 'numer '(rational) numer)
+    (put 'denom '(rational) denom)
 'done )
 
 (define (make-rational n d)
     ((get 'make 'rational ) n d))
 
+(define (numer x)
+    (apply-generic 'numer x))
+(define (denom x)
+    (apply-generic 'denom x))
 
+
+(define (install-real-package)
+    (define (tag x)
+        (cons 'real x))
+    (put 'add '(real real)
+        (lambda (x y) (tag (+ x y))))
+    (put 'sub '(real real)
+        (lambda (x y) (tag (- x y))))
+    (put 'mul '(real real)
+        (lambda (x y) (tag (* x y))))
+    (put 'div '(real real)
+        (lambda (x y) (tag (/ x y))))
+    (put 'make 'real
+        (lambda (x) (tag (+ x 0.0))))
+'done )
+
+(define (make-real x)
+    ((get 'make 'real ) x))
+    
 
 (define (install-complex-package)
     ;; imported proceduers from rectangular and polar packages
@@ -122,3 +144,4 @@
 (install-scheme-number-package)
 (install-rational-package)
 (install-complex-package)
+(install-real-package)

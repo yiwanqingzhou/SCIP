@@ -227,7 +227,7 @@
     (define (adjoin-term term term-list)
         (if (=zero? (coeff term))
             term-list
-            (cons term term-list)))
+            (cons term term-list))) 
     (define (the-empty-termlist) '())
     (define (first-term term-list) (car term-list))
     (define (rest-terms term-list) (cdr term-list))
@@ -348,9 +348,9 @@
                                             (make-term new-o new-c)
                                             L2))
                                     L2)))
-                            (cons (adjoin-term (make-term new-o new-c)
-                                            (car rest-of-result))
-                                (cdr rest-of-result)))))))))
+                            (cons (adjoin-term (make-term new-o new-c)  ;; 商 
+                                               (car rest-of-result))
+                                  (cdr rest-of-result)))))))))          ;; 余
                             
     (define (div-poly p1 p2)
         (if (same-variable? (variable p1) (variable p2))
